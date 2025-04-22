@@ -1,0 +1,22 @@
+:root {
+    --primary-bg: #1A1B29;
+    --secondary-bg: #F9F9FC;
+    --text-color: #333;
+    --active-color: #655DFE;
+    --button-bg: #655DFE;
+    --button-text: white;
+}
+
+body {
+    background: var(--secondary-bg);
+    color: var(--text-color);
+}
+
+.menu a.active {
+    color: var(--active-color);
+}
+
+.meeting-link {
+    background: var(--button-bg);
+    color: var(--button-text);
+}

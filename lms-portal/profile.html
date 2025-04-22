@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile - LMS</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/colors/theme.css" />
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">edunet <span>foundation</span></div>
+        <ul class="menu">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="profile.html" class="active">Profile</a></li>
+            <li><a href="project-selection.html">Project Selection</a></li>
+            <li><a href="offer-letter.html">Offer Letter</a></li>
+            <li><a href="download-certificate.html">Download Certificate</a></li>
+            <li><a href="report-template.html">Report Template</a></li>
+            <li><a href="self-attendance.html">Self Attendance</a></li>
+            <li><a href="study-material.html">Study Material</a></li>
+            <li><a href="assessment.html">Assessment</a></li>
+            <li><a href="session-recording.html">Session Recording</a></li>
+            <li><a href="placement-readiness.html">Placement Readiness</a></li>
+            <li><a href="run-my-code.html">Run My Code</a></li>
+            <li><a href="queries.html">Queries</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>User Profile</h1>
+        </header>
+
+        <div class="content">
+            <h2>Profile Details</h2>
+            <div id="profile-details">
+                <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+                <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to get token from localStorage or other storage
+        function getToken() {
+            return localStorage.getItem('token'); // Adjust if token is stored elsewhere
+        }
+
+        async function fetchUserProfile() {
+            const token = getToken();
+            if (!token) {
+                alert('User not authenticated. Please login.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                // Assuming backend has an endpoint to get user profile details
+                const response = await fetch('/api/user-profile', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user profile: ' + response.statusText);
+                }
+
+                const user = await response.json();
+                document.getElementById('profileName').textContent = user.name || 'N/A';
+                document.getElementById('profileEmail').textContent = user.email || 'N/A';
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                alert('Error fetching profile details. Please try again later.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchUserProfile);
+    </script>
+</body>
+</html>

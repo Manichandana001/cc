@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Session Details - LMS</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/colors/theme.css" />
+    <script src="js/plugins/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Profile dropdown styles */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .profile-dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .profile-dropdown-content a:hover {
+            background-color: #ddd;
+        }
+        .profile-dropdown.show .profile-dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">edunet <span>foundation</span></div>
+        <ul class="menu">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="dashboard.html" class="active">Session Details</a></li>
+            <li><a href="project-selection.html">Project Selection</a></li>
+            <li><a href="offer-letter.html">Offer Letter</a></li>
+            <li><a href="download-certificate.html">Download Certificate</a></li>
+            <li><a href="report-template.html">Report Template</a></li>
+            <li><a href="self-attendance.html">Self Attendance</a></li>
+            <li><a href="study-material.html">Study Material</a></li>
+            <li><a href="assessment.html">Assessment</a></li>
+            <li><a href="session-recording.html">Session Recording</a></li>
+            <li><a href="placement-readiness.html">Placement Readiness</a></li>
+            <li><a href="run-my-code.html">Run My Code</a></li>
+            <li><a href="queries.html">Queries</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Session Details</h1>
+            <div class="user-info">
+                <img src="assets/images/user.png" alt="User Profile" />
+                <span id="user-name">User</span>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <span id="profileName" style="margin-left: 10px; font-weight: bold; user-select: none; cursor: pointer;">User ▼</span>
+                    <div class="profile-dropdown-content" id="profileDropdownContent">
+                        <a href="profile.html" id="myProfileLink">My Profile</a>
+                        <a href="#" id="logoutLink">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <h2>Scheduled Sessions</h2>
+            <div class="table-controls">
+                <button>Excel</button>
+                <button>CSV</button>
+                <button>Copy</button>
+                <input type="text" placeholder="Search..." />
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SESSION DATE</th>
+                        <th>MEETING LINK</th>
+                        <th>PROJECT TITLE/SESSION DETAIL</th>
+                    </tr>
+                </thead>
+                <tbody id="session-table-body">
+                    <!-- Session rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Profile dropdown toggle
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileDropdownContent = document.getElementById('profileDropdownContent');
+        const profileName = document.getElementById('profileName');
+
+        profileDropdown.addEventListener('click', () => {
+            profileDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown if clicked outside
+        window.addEventListener('click', (event) => {
+            if (!profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Logout handler
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            window.location.href = 'index.html';
+        });
+
+        // Set user name from localStorage or default
+        function setUserName() {
+            const userName = localStorage.getItem('userName') || 'User';
+            document.getElementById('user-name').textContent = userName;
+            profileName.textContent = userName + ' ▼';
+        }
+
+        setUserName();
+
+        // Function to get token from localStorage or other storage
+        function getToken() {
+            return localStorage.getItem('token'); // Adjust if token is stored elsewhere
+        }
+
+        async function fetchSessions() {
+            const token = getToken();
+            if (!token) {
+                alert('User not authenticated. Please login.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/sessions', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch sessions: ' + response.statusText);
+                }
+
+                const sessions = await response.json();
+                renderSessions(sessions);
+            } catch (error) {
+                console.error('Error fetching sessions:', error);
+                alert('Error fetching session recordings. Please try again later.');
+            }
+        }
+
+        function renderSessions(sessions) {
+            const tbody = document.getElementById('session-table-body');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            sessions.forEach(session => {
+                const tr = document.createElement('tr');
+
+                const tdDate = document.createElement('td');
+                tdDate.textContent = session.date;
+                tr.appendChild(tdDate);
+
+                const tdLink = document.createElement('td');
+                const aLink = document.createElement('a');
+                aLink.href = session.meetingLink;
+                aLink.textContent = 'Meeting Link';
+                aLink.target = '_blank';
+                aLink.className = 'meeting-link';
+                tdLink.appendChild(aLink);
+                tr.appendChild(tdLink);
+
+                const tdTitle = document.createElement('td');
+                tdTitle.textContent = session.title;
+                tr.appendChild(tdTitle);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Fetch sessions on page load
+        document.addEventListener('DOMContentLoaded', fetchSessions);
+    </script>
+</body>
+</html>

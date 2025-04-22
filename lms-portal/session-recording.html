@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Session Recording - LMS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        video {
+            width: 100%;
+            max-height: 400px;
+            background: black;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .controls {
+            margin-top: 15px;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            margin: 0 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .login-info {
+            text-align: right;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .previous-recordings {
+            margin-top: 30px;
+        }
+        .video-item {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-info" id="loginInfo">Logged in as: Guest</div>
+        <h2>Session Recording</h2>
+        <p>Use this page to record your sessions. You can start and stop recording using the buttons below.</p>
+        <video id="preview" autoplay muted></video>
+        <div class="controls">
+            <button id="startBtn">Start Recording</button>
+            <button id="stopBtn" disabled>Stop Recording</button>
+        </div>
+        <a id="downloadLink" style="display:none;" href="#" download="session-recording.webm">Download Recording</a>
+
+        <div class="previous-recordings">
+            <h3>Previous Session Recordings</h3>
+            <div class="video-item">
+                <video controls>
+                    <source src="videos/session1.webm" type="video/webm" />
+                    Your browser does not support the video tag.
+                </video>
+                <p>Session 1 - Introduction</p>
+            </div>
+            <div class="video-item">
+                <video controls>
+                    <source src="videos/session2.webm" type="video/webm" />
+                    Your browser does not support the video tag.
+                </video>
+                <p>Session 2 - Advanced Topics</p>
+            </div>
+            <div class="video-item">
+                <video controls>
+                    <source src="videos/session3.webm" type="video/webm" />
+                    Your browser does not support the video tag.
+                </video>
+                <p>Session 3 - Q&A</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display logged in user name from localStorage
+        const loginInfo = document.getElementById('loginInfo');
+        const userName = localStorage.getItem('userName') || 'Guest';
+        loginInfo.textContent = 'Logged in as: ' + userName;
+
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        const preview = document.getElementById('preview');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const downloadLink = document.getElementById('downloadLink');
+
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                preview.srcObject = stream;
+                return stream;
+            } catch (err) {
+                alert('Could not access camera and microphone: ' + err);
+                startBtn.disabled = true;
+                stopBtn.disabled = true;
+            }
+        }
+
+        startBtn.addEventListener('click', async () => {
+            const stream = await initCamera();
+            if (!stream) return;
+
+            recordedChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.style.display = 'inline-block';
+            };
+
+            mediaRecorder.start();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            downloadLink.style.display = 'none';
+        });
+
+        stopBtn.addEventListener('click', () => {
+            mediaRecorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project Selection - LMS</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/colors/theme.css" />
+    <script src="js/plugins/jquery-3.6.0.min.js"></script>
+    <script src="js/main.js" defer></script>
+</head>
+<body>
+        <div class="sidebar">
+            <div class="logo">edunet <span>foundation</span></div>
+            <ul class="menu">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <!-- Removed Project Selection menu item as per user request -->
+                <li><a href="offer-letter.html">Offer Letter</a></li>
+                <li><a href="download-certificate.html">Download Certificate</a></li>
+                <li><a href="report-template.html">Report Template</a></li>
+                <li><a href="self-attendance.html">Self Attendance</a></li>
+                <li><a href="study-material.html">Study Material</a></li>
+                <li><a href="assessment.html">Assessment</a></li>
+                <li><a href="session-recording.html">Session Recording</a></li>
+                <li><a href="placement-readiness.html">Placement Readiness</a></li>
+                <li><a href="run-my-code.html">Run My Code</a></li>
+                <li><a href="queries.html">Queries</a></li>
+            </ul>
+        </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Project Selection</h1>
+        </header>
+        <div class="content">
+            <p>Please select one of the following projects to work on. After selecting, click the Submit button to confirm your choice.</p>
+            <form id="projectSelectionForm">
+                <fieldset>
+                    <legend>Available Projects</legend>
+                    <label>
+                        <input type="radio" name="project" value="project1" required>
+                        Project 1: Web-based Learning Management System
+                    </label><br>
+                    <label>
+                        <input type="radio" name="project" value="project2">
+                        Project 2: Online Code Editor and Compiler
+                    </label><br>
+                    <label>
+                        <input type="radio" name="project" value="project3">
+                        Project 3: Student Attendance Tracking System
+                    </label><br>
+                    <label>
+                        <input type="radio" name="project" value="project4">
+                        Project 4: Placement Readiness Assessment Tool
+                    </label>
+                </fieldset>
+                <br>
+                <button type="submit">Submit</button>
+            </form>
+            <div id="selectionResult" style="margin-top: 20px; font-weight: bold;"></div>
+        </div>
+    </div>
+</body>
+</html>
